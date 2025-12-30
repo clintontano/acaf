@@ -555,3 +555,106 @@ footer {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* --- New Additions for Branding & Updates --- */
+
+/* Logo Updates */
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+.logo-text {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+}
+
+/* Header Socials */
+.header-socials {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: 2rem;
+    align-items: center;
+}
+
+.header-socials a {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    transition: color var(--transition-fast);
+}
+
+.header-socials a:hover {
+    color: var(--color-accent);
+}
+
+@media (max-width: 992px) {
+    .header-socials {
+        display: none;
+        /* Hide on smaller screens or move to mobile menu if requested */
+    }
+}
+
+/* Footer Updates */
+.footer-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-brand-header img {
+    height: 50px;
+    width: auto;
+}
+
+.footer-brand-header span {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.footer-full-name {
+    color: #CBD5E1;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Homepage Image Border */
+.img-subtle-border {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Values Section (White Theme Override) */
+.values-section-light .card {
+    background: white;
+    /* Ensure card is white */
+    border: 1px solid var(--color-border);
+    /* Default border */
+    color: var(--color-text-main);
+    /* Dark text */
+}
+
+.values-section-light .card h3 {
+    color: var(--color-primary);
+    /* Dark heading */
+}
+
+.values-section-light .card p {
+    color: var(--color-text-main);
+    /* Dark body text */
+}
+
+.values-section-light .card-icon {
+    /* Icon color can remain accent or primary */
+    color: var(--color-accent);
+}
