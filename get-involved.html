@@ -7,6 +7,7 @@
     <title>Get Involved - ACAF</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
@@ -14,12 +15,13 @@
     <header>
         <div class="container nav-container">
             <a href="index.html" class="logo">
-                <span>ACAF</span> Africa Coalition For Academic Freedom
+                <img src="assets/images/ACAF_logo.png" alt="ACAF Logo" style="height: 50px;">
             </a>
             <button class="mobile-menu-btn">☰</button>
             <nav class="nav-links">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="about.html" class="nav-link">About Us</a>
+                <a href="teams.html" class="nav-link">Teams</a>
                 <a href="work.html" class="nav-link">Our Work</a>
                 <a href="publications.html" class="nav-link">Resources</a>
                 <a href="news.html" class="nav-link">News & Events</a>
@@ -29,10 +31,11 @@
         </div>
     </header>
 
-    <section class="section bg-primary text-center" style="padding: 4rem 0; color: white;">
+    <section class="section text-center" style="padding: 4rem 0;">
         <div class="container fade-in">
-            <h1>Join the Movement</h1>
-            <p style="max-width: 600px; margin: 0 auto; color: #E2E8F0;">There are many ways to support academic freedom
+            <h1 style="color: var(--color-primary);">Join the Movement</h1>
+            <p style="max-width: 600px; margin: 0 auto; color: var(--color-text-main);">There are many ways to support
+                academic freedom
                 in Africa. Choose the path that suits you.</p>
         </div>
     </section>
@@ -85,44 +88,16 @@
         </div>
     </section>
 
-    <!-- Membership Form Placeholder -->
-    <section id="membership-form" class="section bg-white">
-        <div class="container fade-in" style="max-width: 700px;">
-            <h2 class="text-center">Membership Application</h2>
-            <form style="margin-top: 2rem;">
-                <div class="grid grid-2" style="gap: 1rem; margin-bottom: 1rem;">
-                    <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">First Name</label>
-                        <input type="text"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px;">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Last Name</label>
-                        <input type="text"
-                            style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px;">
-                    </div>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email Address</label>
-                    <input type="email"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px;">
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Institution /
-                        Organization</label>
-                    <input type="text"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Membership Type</label>
-                    <select style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px;">
-                        <option>Individual</option>
-                        <option>Student</option>
-                        <option>Institutional</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
-            </form>
+    <section id="membership-form" class="section bg-white text-center">
+        <div class="container fade-in">
+            <h2 style="margin-bottom: 2rem;">Membership Application</h2>
+            <p style="margin-bottom: 3rem;">Please select your membership type to proceed with registration.</p>
+            <div class="flex gap-2 justify-center" style="flex-wrap: wrap;">
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSeuxHG0YWNYPn82bgDe91v8nDezsEDt6vXmcHOrWX18dArLBw/viewform"
+                    target="_blank" class="btn btn-primary">Individual Membership</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLCxEZ664nTlNXG9HmX9jD39rYuhj5UuGFE1PXPUA9PXuslQ/viewform"
+                    target="_blank" class="btn btn-outline">Organizational Membership</a>
+            </div>
         </div>
     </section>
 
@@ -130,13 +105,14 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <h3>ACAF</h3>
+                    <img src="assets/images/ACAF_logo.png" alt="ACAF Logo" style="height: 50px; margin-bottom: 1rem;">
                     <p>Promoting academic freedom and institutional autonomy across the African continent.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Quick Links</h4>
                     <ul class="footer-links">
                         <li><a href="about.html">About Us</a></li>
+                        <li><a href="teams.html">Teams</a></li>
                         <li><a href="work.html">Our Work</a></li>
                         <li><a href="publications.html">Resources</a></li>
                         <li><a href="contact.html">Contact</a></li>
@@ -145,9 +121,9 @@
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <ul class="footer-links">
-                        <li><a href="mailto:info@acaf.africa">info@acaf.africa</a></li>
-                        <li>Nairobi, Kenya</li>
-                        <li>+254 123 456 789</li>
+                        <li><a href="mailto:info@acafafrica.org">info@acafafrica.org</a></li>
+                        <li>CDD – Ghana<br>No. 95 Nortei Ababio Loop<br>North Airport Residential Area</li>
+                        <li>+233 (0)54 559 2375</li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -159,6 +135,18 @@
                         <button type="submit" class="btn btn-primary btn-sm"
                             style="background-color: var(--color-accent); border:none; color: var(--color-primary);">Go</button>
                     </form>
+                    <div style="margin-top: 1.5rem;">
+                        <div class="flex gap-1" style="font-size: 1.2rem;">
+                            <a href="https://web.facebook.com/people/Africa-Coalition-for-Academic-Freedom-ACAF/61567221721200/"
+                                target="_blank" style="color: #94A3B8;"><i class="fab fa-facebook"></i></a>
+                            <a href="https://x.com/acafafrica" target="_blank" style="color: #94A3B8;"><i
+                                    class="fab fa-x-twitter"></i></a>
+                            <a href="https://www.linkedin.com/company/africa-coalition-for-academic-freedom/"
+                                target="_blank" style="color: #94A3B8;"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.youtube.com/@acafafrica" target="_blank" style="color: #94A3B8;"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="footer-bottom">
