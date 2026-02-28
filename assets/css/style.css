@@ -658,3 +658,25 @@ footer {
     /* Icon color can remain accent or primary */
     color: var(--color-accent);
 }
+
+/* Custom Core Values Responsive Layout */
+.core-values-desktop {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.core-values-mobile {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .core-values-desktop {
+        display: none;
+    }
+    
+    .core-values-mobile {
+        display: grid;
+        gap: 2rem;
+    }
+}
