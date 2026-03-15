@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Incidents - ACAF Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-page">
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <img src="assets/images/ACAF_logo.png" alt="ACAF">
+            <div><span>ACAF</span><small>Admin Panel</small></div>
+        </div>
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Overview</div>
+            <a href="admin-dashboard.html" class="admin-nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="admin-nav-section">Monitoring</div>
+            <a href="admin-incidents.html" class="admin-nav-link active"><i class="fas fa-exclamation-triangle"></i> Incidents</a>
+            <div class="admin-nav-section">Taxonomy</div>
+            <a href="admin-taxonomy.html" class="admin-nav-link"><i class="fas fa-tags"></i> Manage Taxonomy</a>
+            <div class="admin-nav-section">Site</div>
+            <a href="monitoring.html" class="admin-nav-link" target="_blank"><i class="fas fa-eye"></i> View Public Page</a>
+        </nav>
+        <div class="admin-nav-footer">
+            <button class="admin-logout-btn" onclick="ACAF.logout(); window.location.href='admin.html';">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 class="admin-topbar-title">Incidents</h1>
+            <div class="admin-topbar-right">
+                <a href="admin-incident-form.html" class="btn-admin-primary">
+                    <i class="fas fa-plus"></i> Add Incident
+                </a>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <div class="admin-breadcrumb">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Incidents</span>
+            </div>
+
+            <div id="alertBanner"></div>
+
+            <div class="admin-panel">
+                <div class="admin-panel-header">
+                    <h2 id="incidentCount">All Incidents</h2>
+                    <div class="admin-toolbar">
+                        <div class="admin-search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="admin-search" id="searchInput" placeholder="Search incidents..." oninput="filterTable(this.value)">
+                        </div>
+                        <select class="admin-filter-select" id="countryFilter" onchange="filterTable(document.getElementById('searchInput').value)">
+                            <option value="">All Countries</option>
+                        </select>
+                        <select class="admin-filter-select" id="typeFilter" onchange="filterTable(document.getElementById('searchInput').value)">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table" id="incidentsTable">
+                        <thead>
+                            <tr>
+                                <th style="min-width:200px;">Title</th>
+                                <th>Date</th>
+                                <th>Country</th>
+                                <th>Institution</th>
+                                <th>Incident Types</th>
+                                <th style="text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="6" style="text-align:center;padding:3rem;color:var(--color-text-light);">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="emptyState" class="admin-empty" style="display:none;">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No incidents found</h3>
+                    <p>Try adjusting your search, or <a href="admin-incident-form.html" style="color:var(--color-primary);font-weight:600;">add the first incident</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="confirm-overlay" id="deleteConfirm">
+    <div class="confirm-box">
+        <h3><i class="fas fa-trash" style="color:#DC2626;margin-right:0.5rem;"></i>Delete Incident</h3>
+        <p>Are you sure you want to delete "<span id="deleteTitle"></span>"? This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn-admin-secondary" onclick="closeDeleteConfirm()">Cancel</button>
+            <button class="btn-admin-danger" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/acaf-data.js"></script>
+<script>
+    if (!ACAF.requireAuth()) { /* redirect */ }
+
+    let allIncidents = [];
+    let deleteTargetId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        allIncidents = ACAF.getIncidents();
+        populateFilters();
+        renderTable(allIncidents);
+
+        // Show success message from redirect
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('saved') === '1') {
+            showAlert('Incident saved successfully.', 'success');
+        } else if (params.get('deleted') === '1') {
+            showAlert('Incident deleted successfully.', 'success');
+        }
+    });
+
+    function populateFilters() {
+        const countries = [...new Set(allIncidents.map(i => i.country).filter(Boolean))].sort();
+        const countrySelect = document.getElementById('countryFilter');
+        countries.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            countrySelect.appendChild(opt);
+        });
+
+        const types = ACAF.getIncidentTypes();
+        const typeSelect = document.getElementById('typeFilter');
+        types.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.name; opt.textContent = t.name;
+            typeSelect.appendChild(opt);
+        });
+    }
+
+    function filterTable(query) {
+        const q = query.toLowerCase();
+        const country = document.getElementById('countryFilter').value;
+        const type = document.getElementById('typeFilter').value;
+
+        const filtered = allIncidents.filter(inc => {
+            const text = [inc.title, inc.description, inc.country, inc.institution,
+                (inc.incidentTypes || []).join(' ')].join(' ').toLowerCase();
+            const matchQ = !q || text.includes(q);
+            const matchC = !country || inc.country === country;
+            const matchT = !type || (inc.incidentTypes || []).includes(type);
+            return matchQ && matchC && matchT;
+        });
+
+        renderTable(filtered);
+    }
+
+    function renderTable(incidents) {
+        const tbody = document.getElementById('tableBody');
+        const emptyState = document.getElementById('emptyState');
+        const countEl = document.getElementById('incidentCount');
+
+        countEl.textContent = `All Incidents (${incidents.length})`;
+
+        if (!incidents.length) {
+            tbody.innerHTML = '';
+            emptyState.style.display = '';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        tbody.innerHTML = incidents.map(inc => {
+            const date = inc.date ? new Date(inc.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+            const typeBadges = (inc.incidentTypes || []).slice(0, 2).map(t =>
+                `<span class="badge badge-blue">${escapeHtml(t)}</span>`).join('');
+            const moreTypes = (inc.incidentTypes || []).length > 2 ?
+                `<span class="badge badge-blue">+${(inc.incidentTypes || []).length - 2}</span>` : '';
+            return `<tr data-id="${inc.id}">
+                <td class="col-title"><span title="${escapeHtml(inc.title)}">${escapeHtml(inc.title)}</span></td>
+                <td style="white-space:nowrap;">${date}</td>
+                <td>${escapeHtml(inc.country || '—')}</td>
+                <td style="font-size:0.8rem;">${escapeHtml(inc.institution || '—')}</td>
+                <td><div class="badge-tags">${typeBadges}${moreTypes}</div></td>
+                <td>
+                    <div class="table-actions" style="justify-content:flex-end;">
+                        <a href="monitoring.html" target="_blank" class="btn-icon btn-view" title="View on public page"><i class="fas fa-eye"></i></a>
+                        <a href="admin-incident-form.html?id=${inc.id}" class="btn-icon btn-edit" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="openDeleteConfirm('${inc.id}', '${escapeAttr(inc.title)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function openDeleteConfirm(id, title) {
+        deleteTargetId = id;
+        document.getElementById('deleteTitle').textContent = title;
+        document.getElementById('deleteConfirm').classList.add('open');
+    }
+
+    function closeDeleteConfirm() {
+        deleteTargetId = null;
+        document.getElementById('deleteConfirm').classList.remove('open');
+    }
+
+    function confirmDelete() {
+        if (!deleteTargetId) return;
+        ACAF.deleteIncident(deleteTargetId);
+        allIncidents = ACAF.getIncidents();
+        closeDeleteConfirm();
+        filterTable(document.getElementById('searchInput').value);
+        showAlert('Incident deleted successfully.', 'success');
+    }
+
+    function showAlert(msg, type) {
+        const el = document.getElementById('alertBanner');
+        el.innerHTML = `<div class="admin-alert admin-alert-${type}"><i class="fas fa-check-circle"></i>${escapeHtml(msg)}</div>`;
+        setTimeout(() => { el.innerHTML = ''; }, 4000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // Close confirm on overlay click
+    document.getElementById('deleteConfirm').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeDeleteConfirm();
+    });
+</script>
+</body>
+</html>

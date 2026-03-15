@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring - Africa Coalition For Academic Freedom (ACAF)</title>
+    <meta name="description" content="Track and search incidents affecting academic freedom across Africa. Filter by country, institution, incident type, and date range.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/monitoring.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/ACAF_logo.png" alt="ACAF Logo">
+                <span class="logo-text">ACAF</span>
+            </a>
+            <button class="mobile-menu-btn">&#9776;</button>
+            <nav class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About Us</a>
+                <a href="teams.html" class="nav-link">Team</a>
+                <a href="work.html" class="nav-link">Our Work</a>
+                <a href="monitoring.html" class="nav-link active">Monitoring</a>
+                <a href="news.html" class="nav-link">News &amp; Events</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="get-involved.html" class="btn btn-primary btn-sm">Get Involved</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="monitoring-hero">
+        <div class="container fade-in">
+            <h1>Monitoring Academic Freedom in Africa</h1>
+            <p>A searchable database of incidents threatening academic freedom, institutional autonomy, and freedom of expression across African higher education institutions.</p>
+        </div>
+    </section>
+
+    <!-- Main Monitoring Section -->
+    <div class="monitoring-body">
+        <div class="container">
+            <div class="monitoring-layout">
+
+                <!-- ── FILTER SIDEBAR ── -->
+                <aside>
+                    <!-- Mobile toggle -->
+                    <button class="filter-toggle-btn" id="filterToggleBtn">
+                        <i class="fas fa-sliders-h"></i>
+                        <span id="filterToggleLabel">Show Filters</span>
+                    </button>
+
+                    <div class="filter-sidebar" id="filterSidebar">
+                        <div class="filter-sidebar-header">
+                            <h3><i class="fas fa-filter" style="margin-right:0.5rem;"></i>Filters</h3>
+                            <button class="filter-clear-btn" id="clearAllBtn">Clear All</button>
+                        </div>
+
+                        <!-- A. Countries -->
+                        <div class="filter-section" id="section-countries">
+                            <div class="filter-section-header" onclick="toggleSection('section-countries')">
+                                <span class="filter-section-title">Countries</span>
+                                <i class="fas fa-chevron-down filter-section-chevron"></i>
+                            </div>
+                            <div class="filter-section-body">
+                                <div class="filter-search-wrap">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="filter-search" id="countrySearch" placeholder="Search countries..." oninput="filterCountryList(this.value)">
+                                </div>
+                                <div id="countryList"></div>
+                            </div>
+                        </div>
+
+                        <!-- B. Institutions -->
+                        <div class="filter-section" id="section-institutions">
+                            <div class="filter-section-header" onclick="toggleSection('section-institutions')">
+                                <span class="filter-section-title">Institutions</span>
+                                <i class="fas fa-chevron-down filter-section-chevron"></i>
+                            </div>
+                            <div class="filter-section-body">
+                                <div class="filter-search-wrap">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="filter-search" id="institutionSearch" placeholder="Search institutions..." oninput="filterInstitutionList(this.value)">
+                                </div>
+                                <div id="institutionList">
+                                    <p style="font-size:0.8rem;color:var(--color-text-light);margin-top:0.5rem;" id="institutionHint">Loading institutions...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- C. Type of Incident -->
+                        <div class="filter-section" id="section-incidentType">
+                            <div class="filter-section-header" onclick="toggleSection('section-incidentType')">
+                                <span class="filter-section-title">Type of Incident</span>
+                                <i class="fas fa-chevron-down filter-section-chevron"></i>
+                            </div>
+                            <div class="filter-section-body">
+                                <div class="filter-search-wrap">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="filter-search" id="incidentTypeSearch" placeholder="Search types..." oninput="filterList('incidentTypeList', this.value)">
+                                </div>
+                                <div id="incidentTypeList"></div>
+                            </div>
+                        </div>
+
+                        <!-- D. Type of Discrimination -->
+                        <div class="filter-section" id="section-discriminationType">
+                            <div class="filter-section-header" onclick="toggleSection('section-discriminationType')">
+                                <span class="filter-section-title">Type of Discrimination</span>
+                                <i class="fas fa-chevron-down filter-section-chevron"></i>
+                            </div>
+                            <div class="filter-section-body">
+                                <div id="discriminationTypeList"></div>
+                            </div>
+                        </div>
+
+                        <!-- E. Date Range -->
+                        <div class="filter-section open" id="section-dateRange">
+                            <div class="filter-section-header" onclick="toggleSection('section-dateRange')">
+                                <span class="filter-section-title">Date Range</span>
+                                <i class="fas fa-chevron-down filter-section-chevron"></i>
+                            </div>
+                            <div class="filter-section-body">
+                                <div class="date-range-row">
+                                    <div>
+                                        <label for="dateFrom">From</label>
+                                        <input type="date" class="date-input" id="dateFrom" onchange="handleDateChange()">
+                                    </div>
+                                    <div>
+                                        <label for="dateTo">To</label>
+                                        <input type="date" class="date-input" id="dateTo" onchange="handleDateChange()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /filter-sidebar -->
+                </aside>
+
+                <!-- ── RESULTS AREA ── -->
+                <div class="results-area">
+
+                    <!-- Search Bar -->
+                    <div class="search-bar-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-bar" id="globalSearch" placeholder="Keyword or Phrase" oninput="handleSearchInput(this.value)">
+                    </div>
+
+                    <!-- Stats Grid (hidden when filtering) -->
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="statTotal">—</div>
+                            <div class="stat-card-label">Total Incidents</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="statCountries">—</div>
+                            <div class="stat-card-label">Countries</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value" id="statInstitutions">—</div>
+                            <div class="stat-card-label">Institutions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-value date-range-val" id="statDateRange">—</div>
+                            <div class="stat-card-label">Date Range</div>
+                        </div>
+                    </div>
+
+                    <!-- Results header (count + active filters) -->
+                    <div id="resultsHeaderWrap" style="display:none;">
+                        <div class="results-header">
+                            <span class="results-count" id="resultsCount"></span>
+                            <div class="active-filters-row" id="activeFiltersRow"></div>
+                        </div>
+                    </div>
+
+                    <!-- Incidents List -->
+                    <div id="incidentsList"></div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="pagination"></div>
+
+                </div><!-- /results-area -->
+
+            </div><!-- /monitoring-layout -->
+        </div>
+    </div>
+
+    <!-- ── INCIDENT DETAIL MODAL ── -->
+    <div class="modal-overlay" id="incidentModal" onclick="closeModal(event)">
+        <div class="modal-box" id="incidentModalBox">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-meta-grid" id="modalMeta"></div>
+                <div id="modalTypesSection">
+                    <div class="modal-section-title">Type of Incident</div>
+                    <div class="incident-tags" id="modalIncidentTypes"></div>
+                    <div class="modal-section-title" style="margin-top:1rem;">Type of Discrimination</div>
+                    <div class="incident-tags" id="modalDiscrimTypes"></div>
+                </div>
+                <div class="modal-section-title" style="margin-top:1.25rem;">Full Description</div>
+                <p class="modal-description" id="modalDescription"></p>
+                <div id="modalDocuments" style="display:none;">
+                    <div class="modal-section-title" style="margin-top:1.25rem;">Supporting Documents</div>
+                    <div id="modalDocsList"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id="modalSource"></span>
+                <button class="btn btn-outline btn-sm" onclick="closeModalDirect()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-brand-header">
+                        <img src="assets/images/ACAF_logo.png" alt="ACAF Logo">
+                        <span>ACAF</span>
+                    </div>
+                    <p class="footer-full-name">Africa Coalition for Academic Freedom</p>
+                    <p>Defending academic freedom to advance democracy, science and sustainable development in Africa</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="teams.html">Team</a></li>
+                        <li><a href="work.html">Our Work</a></li>
+                        <li><a href="monitoring.html">Monitoring</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:info@acafafrica.org">info@acafafrica.org</a></li>
+                        <li>CDD &ndash; Ghana<br>No. 95 Nortei Ababio Loop<br>North Airport Residential Area</li>
+                        <li>+233 (0)54 559 2375</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Stay Informed</h4>
+                    <p style="font-size:0.875rem;color:#94A3B8;margin-bottom:1rem;">Subscribe to our periodic newsletter.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Your email">
+                        <button type="submit" class="btn btn-primary btn-sm" style="background-color:var(--color-accent);border:none;color:var(--color-primary);">Go</button>
+                    </form>
+                    <div style="margin-top:1.5rem;">
+                        <div class="flex gap-1" style="font-size:1.2rem;">
+                            <a href="https://web.facebook.com/people/Africa-Coalition-for-Academic-Freedom-ACAF/61567221721200/" target="_blank" style="color:#94A3B8;"><i class="fab fa-facebook"></i></a>
+                            <a href="https://x.com/acafafrica" target="_blank" style="color:#94A3B8;"><i class="fab fa-x-twitter"></i></a>
+                            <a href="https://www.linkedin.com/company/africa-coalition-for-academic-freedom/" target="_blank" style="color:#94A3B8;"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.youtube.com/@acafafrica" target="_blank" style="color:#94A3B8;"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Africa Coalition For Academic Freedom. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/acaf-data.js"></script>
+    <script>
+    // ── STATE ─────────────────────────────────────────────────────────────────────
+    const state = {
+        search: '',
+        selectedCountries: new Set(),
+        selectedInstitutions: new Set(),
+        selectedIncidentTypes: new Set(),
+        selectedDiscrimTypes: new Set(),
+        dateFrom: '',
+        dateTo: '',
+        page: 1,
+        perPage: 10,
+        filteredIncidents: [],
+        allIncidents: []
+    };
+
+    // ── INIT ──────────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        ACAF.initialize();
+        state.allIncidents = ACAF.getIncidents();
+        renderCountryFilter();
+        renderIncidentTypeFilter();
+        renderDiscriminationTypeFilter();
+        updateInstitutionFilter();
+        applyFilters();
+        renderStats();
+    });
+
+    // ── FILTER SECTIONS (accordion) ───────────────────────────────────────────────
+    function toggleSection(id) {
+        const el = document.getElementById(id);
+        const isOpen = el.classList.contains('open');
+        // Close all collapsible sections (not the date range — it uses same toggle but is fine either way)
+        document.querySelectorAll('.filter-section').forEach(s => s.classList.remove('open'));
+        // Open the clicked one only if it was closed
+        if (!isOpen) el.classList.add('open');
+    }
+
+    // ── MOBILE FILTER TOGGLE ──────────────────────────────────────────────────────
+    document.getElementById('filterToggleBtn').addEventListener('click', () => {
+        const sidebar = document.getElementById('filterSidebar');
+        const label = document.getElementById('filterToggleLabel');
+        sidebar.classList.toggle('mobile-open');
+        label.textContent = sidebar.classList.contains('mobile-open') ? 'Hide Filters' : 'Show Filters';
+    });
+
+    // ── COUNTRY FILTER ────────────────────────────────────────────────────────────
+    const REGIONS = ['Central Africa', 'East Africa', 'North Africa', 'Southern Africa', 'West Africa'];
+
+    function renderCountryFilter() {
+        const countries = ACAF.getCountries();
+        const grouped = {};
+        REGIONS.forEach(r => { grouped[r] = []; });
+        countries.forEach(c => {
+            if (grouped[c.region]) grouped[c.region].push(c);
+        });
+
+        const container = document.getElementById('countryList');
+        container.innerHTML = '';
+        REGIONS.forEach(region => {
+            const list = grouped[region] || [];
+            if (!list.length) return;
+            const regionEl = document.createElement('div');
+            regionEl.className = 'region-group';
+            regionEl.dataset.region = region;
+            regionEl.innerHTML = `
+                <div class="region-toggle" onclick="this.parentElement.classList.toggle('open')">
+                    <span class="region-name">${region}</span>
+                    <i class="fas fa-chevron-down region-chevron"></i>
+                </div>
+                <div class="region-countries">
+                    ${list.map(c => `
+                        <label class="checkbox-item" data-country="${c.name}">
+                            <input type="checkbox" value="${c.name}" onchange="handleCountryChange('${c.name}', this.checked)">
+                            <span>${c.name}</span>
+                        </label>
+                    `).join('')}
+                </div>`;
+            container.appendChild(regionEl);
+        });
+    }
+
+    function filterCountryList(query) {
+        const q = query.toLowerCase().trim();
+        document.querySelectorAll('#countryList .checkbox-item').forEach(item => {
+            const name = item.dataset.country.toLowerCase();
+            item.classList.toggle('hidden', q.length > 0 && !name.includes(q));
+        });
+        // Expand all regions while searching so results are visible; collapse when cleared
+        document.querySelectorAll('#countryList .region-group').forEach(r => {
+            r.classList.toggle('open', q.length > 0);
+        });
+    }
+
+    function handleCountryChange(country, checked) {
+        if (checked) state.selectedCountries.add(country);
+        else state.selectedCountries.delete(country);
+        state.page = 1;
+        updateInstitutionFilter();
+        applyFilters();
+    }
+
+    // ── INSTITUTION FILTER ────────────────────────────────────────────────────────
+    function updateInstitutionFilter() {
+        const selectedCountries = [...state.selectedCountries];
+        const institutions = ACAF.getInstitutionsByCountries(selectedCountries);
+        const container = document.getElementById('institutionList');
+        const hint = document.getElementById('institutionHint');
+
+        // Uncheck removed institutions
+        [...state.selectedInstitutions].forEach(inst => {
+            if (!institutions.find(i => i.name === inst)) {
+                state.selectedInstitutions.delete(inst);
+            }
+        });
+
+        container.innerHTML = '';
+
+        if (!institutions.length) {
+            container.innerHTML = '<p style="font-size:0.8rem;color:var(--color-text-light);margin-top:0.5rem;">No institutions found.</p>';
+            return;
+        }
+
+        if (selectedCountries.length === 0) {
+            // All institutions, flat list
+            container.innerHTML = institutions.map(i => `
+                <label class="checkbox-item" data-inst="${i.name}">
+                    <input type="checkbox" value="${i.name}" ${state.selectedInstitutions.has(i.name) ? 'checked' : ''} onchange="handleInstitutionChange('${i.name.replace(/'/g,"\\'")}', this.checked)">
+                    <span>${i.name}${i.abbreviation ? ` (${i.abbreviation})` : ''}</span>
+                </label>`).join('');
+        } else {
+            // Grouped by country
+            const grouped = {};
+            selectedCountries.forEach(c => { grouped[c] = []; });
+            institutions.forEach(i => {
+                if (grouped[i.country]) grouped[i.country].push(i);
+            });
+            Object.entries(grouped).forEach(([country, insts]) => {
+                if (!insts.length) return;
+                const group = document.createElement('div');
+                group.className = 'inst-country-group';
+                group.innerHTML = `<div class="inst-country-label">${country}</div>` +
+                    insts.map(i => `
+                        <label class="checkbox-item" data-inst="${i.name}">
+                            <input type="checkbox" value="${i.name}" ${state.selectedInstitutions.has(i.name) ? 'checked' : ''} onchange="handleInstitutionChange('${i.name.replace(/'/g,"\\'")}', this.checked)">
+                            <span>${i.name}${i.abbreviation ? ` (${i.abbreviation})` : ''}</span>
+                        </label>`).join('');
+                container.appendChild(group);
+            });
+        }
+    }
+
+    function filterInstitutionList(query) {
+        const q = query.toLowerCase().trim();
+        document.querySelectorAll('#institutionList .checkbox-item').forEach(item => {
+            const name = item.dataset.inst.toLowerCase();
+            item.classList.toggle('hidden', q.length > 0 && !name.includes(q));
+        });
+    }
+
+    function handleInstitutionChange(inst, checked) {
+        if (checked) state.selectedInstitutions.add(inst);
+        else state.selectedInstitutions.delete(inst);
+        state.page = 1;
+        applyFilters();
+    }
+
+    // ── INCIDENT TYPE FILTER ──────────────────────────────────────────────────────
+    function renderIncidentTypeFilter() {
+        const types = ACAF.getIncidentTypes();
+        const container = document.getElementById('incidentTypeList');
+        container.innerHTML = types.map(t => `
+            <label class="checkbox-item" data-type="${t.name}">
+                <input type="checkbox" value="${t.name}" onchange="handleIncidentTypeChange('${t.name.replace(/'/g,"\\'")}', this.checked)">
+                <span>${t.name}</span>
+            </label>`).join('');
+    }
+
+    function filterList(containerId, query) {
+        const q = query.toLowerCase().trim();
+        document.querySelectorAll('#' + containerId + ' .checkbox-item').forEach(item => {
+            const text = (item.dataset.type || item.dataset.disc || '').toLowerCase();
+            item.classList.toggle('hidden', q.length > 0 && !text.includes(q));
+        });
+    }
+
+    function handleIncidentTypeChange(type, checked) {
+        if (checked) state.selectedIncidentTypes.add(type);
+        else state.selectedIncidentTypes.delete(type);
+        state.page = 1;
+        applyFilters();
+    }
+
+    // ── DISCRIMINATION TYPE FILTER ────────────────────────────────────────────────
+    function renderDiscriminationTypeFilter() {
+        const types = ACAF.getDiscriminationTypes();
+        const container = document.getElementById('discriminationTypeList');
+        container.innerHTML = types.map(t => `
+            <label class="checkbox-item" data-disc="${t.name}">
+                <input type="checkbox" value="${t.name}" onchange="handleDiscrimTypeChange('${t.name.replace(/'/g,"\\'")}', this.checked)">
+                <span>${t.name}</span>
+            </label>`).join('');
+    }
+
+    function handleDiscrimTypeChange(type, checked) {
+        if (checked) state.selectedDiscrimTypes.add(type);
+        else state.selectedDiscrimTypes.delete(type);
+        state.page = 1;
+        applyFilters();
+    }
+
+    // ── DATE RANGE ────────────────────────────────────────────────────────────────
+    function handleDateChange() {
+        state.dateFrom = document.getElementById('dateFrom').value;
+        state.dateTo = document.getElementById('dateTo').value;
+        state.page = 1;
+        applyFilters();
+    }
+
+    // ── SEARCH ────────────────────────────────────────────────────────────────────
+    function handleSearchInput(value) {
+        state.search = value.trim();
+        state.page = 1;
+        applyFilters();
+    }
+
+    // ── CORE FILTER LOGIC ─────────────────────────────────────────────────────────
+    function isFiltering() {
+        return state.search ||
+            state.selectedCountries.size > 0 ||
+            state.selectedInstitutions.size > 0 ||
+            state.selectedIncidentTypes.size > 0 ||
+            state.selectedDiscrimTypes.size > 0 ||
+            state.dateFrom || state.dateTo;
+    }
+
+    function applyFilters() {
+        const incidents = ACAF.getIncidents();
+        const q = state.search.toLowerCase();
+
+        state.filteredIncidents = incidents.filter(inc => {
+            // Global search
+            if (q) {
+                const searchable = [
+                    inc.title, inc.description, inc.country, inc.institution,
+                    inc.city, (inc.incidentTypes || []).join(' '),
+                    (inc.discriminationTypes || []).join(' ')
+                ].join(' ').toLowerCase();
+                if (!searchable.includes(q)) return false;
+            }
+            // Countries
+            if (state.selectedCountries.size > 0 && !state.selectedCountries.has(inc.country)) return false;
+            // Institutions
+            if (state.selectedInstitutions.size > 0 && !state.selectedInstitutions.has(inc.institution)) return false;
+            // Incident types
+            if (state.selectedIncidentTypes.size > 0) {
+                const types = inc.incidentTypes || [];
+                if (!types.some(t => state.selectedIncidentTypes.has(t))) return false;
+            }
+            // Discrimination types
+            if (state.selectedDiscrimTypes.size > 0) {
+                const types = inc.discriminationTypes || [];
+                if (!types.some(t => state.selectedDiscrimTypes.has(t))) return false;
+            }
+            // Date from
+            if (state.dateFrom && inc.date < state.dateFrom) return false;
+            // Date to
+            if (state.dateTo && inc.date > state.dateTo) return false;
+            return true;
+        });
+
+        // Sort newest first
+        state.filteredIncidents.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+        if (isFiltering()) {
+            document.getElementById('statsGrid').classList.add('hidden');
+            document.getElementById('resultsHeaderWrap').style.display = '';
+        } else {
+            document.getElementById('statsGrid').classList.remove('hidden');
+            document.getElementById('resultsHeaderWrap').style.display = '';
+            renderStats();
+        }
+
+        renderResultsHeader();
+        renderResults();
+        renderPagination();
+    }
+
+    // ── STATS ─────────────────────────────────────────────────────────────────────
+    function renderStats() {
+        const incidents = ACAF.getIncidents();
+        document.getElementById('statTotal').textContent = incidents.length;
+        const countries = new Set(incidents.map(i => i.country).filter(Boolean));
+        document.getElementById('statCountries').textContent = countries.size;
+        const insts = new Set(incidents.map(i => i.institution).filter(Boolean));
+        document.getElementById('statInstitutions').textContent = insts.size;
+        const dates = incidents.map(i => i.date).filter(Boolean).sort();
+        if (dates.length) {
+            const minYear = dates[0].substring(0, 4);
+            const maxYear = dates[dates.length - 1].substring(0, 4);
+            document.getElementById('statDateRange').textContent = minYear === maxYear ? minYear : `${minYear} – ${maxYear}`;
+        } else {
+            document.getElementById('statDateRange').textContent = '—';
+        }
+    }
+
+    // ── RESULTS HEADER ────────────────────────────────────────────────────────────
+    function renderResultsHeader() {
+        const total = state.filteredIncidents.length;
+        const allTotal = ACAF.getIncidents().length;
+        const countEl = document.getElementById('resultsCount');
+
+        if (isFiltering()) {
+            countEl.innerHTML = `Showing <strong>${total}</strong> of <strong>${allTotal}</strong> incident${allTotal !== 1 ? 's' : ''}`;
+        } else {
+            countEl.innerHTML = `<strong>${total}</strong> incident${total !== 1 ? 's' : ''} in the database`;
+        }
+
+        renderActiveFilterTags();
+    }
+
+    function renderActiveFilterTags() {
+        const row = document.getElementById('activeFiltersRow');
+        row.innerHTML = '';
+
+        state.selectedCountries.forEach(c => {
+            row.appendChild(makeTag(c, () => { state.selectedCountries.delete(c); uncheckFilter(c, 'countries'); }));
+        });
+        state.selectedInstitutions.forEach(i => {
+            row.appendChild(makeTag(i, () => { state.selectedInstitutions.delete(i); uncheckFilter(i, 'institutions'); }));
+        });
+        state.selectedIncidentTypes.forEach(t => {
+            row.appendChild(makeTag(t, () => { state.selectedIncidentTypes.delete(t); uncheckFilter(t, 'incidentTypes'); }));
+        });
+        state.selectedDiscrimTypes.forEach(t => {
+            row.appendChild(makeTag(t, () => { state.selectedDiscrimTypes.delete(t); uncheckFilter(t, 'discrimTypes'); }));
+        });
+        if (state.dateFrom || state.dateTo) {
+            const label = [state.dateFrom, state.dateTo].filter(Boolean).join(' → ');
+            row.appendChild(makeTag('Date: ' + label, () => {
+                state.dateFrom = ''; state.dateTo = '';
+                document.getElementById('dateFrom').value = '';
+                document.getElementById('dateTo').value = '';
+                applyFilters();
+            }));
+        }
+    }
+
+    function makeTag(text, removeCallback) {
+        const tag = document.createElement('span');
+        tag.className = 'active-filter-tag';
+        tag.innerHTML = `${escapeHtml(text)}<button title="Remove filter" onclick="this.parentElement._remove()"><i class="fas fa-times"></i></button>`;
+        tag._remove = () => { removeCallback(); state.page = 1; applyFilters(); };
+        return tag;
+    }
+
+    function uncheckFilter(value, type) {
+        const selectors = {
+            countries: `#countryList input[value="${CSS.escape(value)}"]`,
+            institutions: `#institutionList input[value="${CSS.escape(value)}"]`,
+            incidentTypes: `#incidentTypeList input[value="${CSS.escape(value)}"]`,
+            discrimTypes: `#discriminationTypeList input[value="${CSS.escape(value)}"]`,
+        };
+        const input = document.querySelector(selectors[type]);
+        if (input) input.checked = false;
+    }
+
+    // ── CLEAR ALL ─────────────────────────────────────────────────────────────────
+    document.getElementById('clearAllBtn').addEventListener('click', clearAllFilters);
+
+    function clearAllFilters() {
+        state.search = '';
+        state.selectedCountries.clear();
+        state.selectedInstitutions.clear();
+        state.selectedIncidentTypes.clear();
+        state.selectedDiscrimTypes.clear();
+        state.dateFrom = '';
+        state.dateTo = '';
+        state.page = 1;
+        document.getElementById('globalSearch').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        document.querySelectorAll('.filter-sidebar input[type="checkbox"]').forEach(cb => cb.checked = false);
+        applyFilters();
+        renderStats();
+    }
+
+    // ── RENDER INCIDENTS ──────────────────────────────────────────────────────────
+    function renderResults() {
+        const container = document.getElementById('incidentsList');
+        const start = (state.page - 1) * state.perPage;
+        const pageItems = state.filteredIncidents.slice(start, start + state.perPage);
+
+        if (!pageItems.length) {
+            container.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>No incidents found</h3>
+                    <p>Try adjusting your search terms or filters.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="incidents-list">${pageItems.map(renderIncidentCard).join('')}</div>`;
+    }
+
+    function renderIncidentCard(inc) {
+        const date = inc.date ? new Date(inc.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : 'Unknown date';
+        const typeTags = (inc.incidentTypes || []).map(t => `<span class="incident-tag type-tag">${escapeHtml(t)}</span>`).join('');
+        const discTags = (inc.discriminationTypes || []).filter(d => d !== 'None').map(t => `<span class="incident-tag disc-tag">${escapeHtml(t)}</span>`).join('');
+        const excerpt = (inc.description || '').substring(0, 200) + ((inc.description || '').length > 200 ? '...' : '');
+
+        return `
+        <div class="incident-card" onclick="openModal('${inc.id}')">
+            <div class="incident-card-header">
+                <h3 class="incident-card-title">${escapeHtml(inc.title)}</h3>
+                <span class="incident-card-date">${date}</span>
+            </div>
+            <div class="incident-card-meta">
+                ${inc.country ? `<span class="incident-meta-item"><i class="fas fa-map-marker-alt"></i>${escapeHtml(inc.country)}${inc.city ? ', ' + escapeHtml(inc.city) : ''}</span>` : ''}
+                ${inc.institution ? `<span class="incident-meta-item"><i class="fas fa-university"></i>${escapeHtml(inc.institution)}</span>` : ''}
+            </div>
+            <div class="incident-tags">${typeTags}${discTags}</div>
+            <p class="incident-card-excerpt">${escapeHtml(excerpt)}</p>
+            <div class="incident-card-footer">
+                <span class="incident-read-more">Read More <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>`;
+    }
+
+    // ── PAGINATION ────────────────────────────────────────────────────────────────
+    function renderPagination() {
+        const total = state.filteredIncidents.length;
+        const totalPages = Math.ceil(total / state.perPage);
+        const container = document.getElementById('pagination');
+
+        if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+        let html = `<button class="page-btn" onclick="goToPage(${state.page - 1})" ${state.page === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+
+        const range = getPaginationRange(state.page, totalPages);
+        range.forEach(p => {
+            if (p === '...') {
+                html += `<span class="page-btn" style="cursor:default;border:none;">…</span>`;
+            } else {
+                html += `<button class="page-btn ${p === state.page ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+            }
+        });
+
+        html += `<button class="page-btn" onclick="goToPage(${state.page + 1})" ${state.page === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+        container.innerHTML = html;
+    }
+
+    function getPaginationRange(current, total) {
+        if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+        if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+        if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+        return [1, '...', current - 1, current, current + 1, '...', total];
+    }
+
+    function goToPage(page) {
+        const totalPages = Math.ceil(state.filteredIncidents.length / state.perPage);
+        if (page < 1 || page > totalPages) return;
+        state.page = page;
+        renderResults();
+        renderPagination();
+        window.scrollTo({ top: document.querySelector('.monitoring-body').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    // ── MODAL ─────────────────────────────────────────────────────────────────────
+    function openModal(id) {
+        const inc = ACAF.getIncidentById(id);
+        if (!inc) return;
+
+        document.getElementById('modalTitle').textContent = inc.title;
+
+        const date = inc.date ? new Date(inc.date).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : 'Unknown';
+        document.getElementById('modalMeta').innerHTML = `
+            <div class="modal-meta-item"><label>Date</label><span>${escapeHtml(date)}</span></div>
+            <div class="modal-meta-item"><label>Country</label><span>${escapeHtml(inc.country || '—')}</span></div>
+            <div class="modal-meta-item"><label>Institution</label><span>${escapeHtml(inc.institution || '—')}</span></div>
+            <div class="modal-meta-item"><label>City / Location</label><span>${escapeHtml(inc.city || '—')}</span></div>`;
+
+        document.getElementById('modalIncidentTypes').innerHTML = (inc.incidentTypes || []).map(t =>
+            `<span class="incident-tag type-tag">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--color-text-light);font-size:0.85rem;">—</span>';
+
+        document.getElementById('modalDiscrimTypes').innerHTML = (inc.discriminationTypes || []).map(t =>
+            `<span class="incident-tag disc-tag">${escapeHtml(t)}</span>`).join('') || '<span style="color:var(--color-text-light);font-size:0.85rem;">—</span>';
+
+        document.getElementById('modalDescription').textContent = inc.description || '';
+
+        // Documents
+        const docsWrap = document.getElementById('modalDocuments');
+        if (inc.documents && inc.documents.length) {
+            document.getElementById('modalDocsList').innerHTML = inc.documents.map(d =>
+                `<div class="file-item"><i class="fas fa-file-pdf"></i> ${escapeHtml(d)}</div>`).join('');
+            docsWrap.style.display = '';
+        } else {
+            docsWrap.style.display = 'none';
+        }
+
+        // Source
+        const sourceEl = document.getElementById('modalSource');
+        if (inc.source) {
+            sourceEl.innerHTML = `<a href="${escapeHtml(inc.source)}" target="_blank" rel="noopener" class="modal-source-link"><i class="fas fa-external-link-alt"></i> View Source</a>`;
+        } else {
+            sourceEl.innerHTML = '';
+        }
+
+        document.getElementById('incidentModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+        if (e.target === document.getElementById('incidentModal')) closeModalDirect();
+    }
+
+    function closeModalDirect() {
+        document.getElementById('incidentModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+    // ── UTILITY ───────────────────────────────────────────────────────────────────
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    </script>
+
+</body>
+</html>

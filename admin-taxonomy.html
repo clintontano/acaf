@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Taxonomy - ACAF Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-page">
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <img src="assets/images/ACAF_logo.png" alt="ACAF">
+            <div><span>ACAF</span><small>Admin Panel</small></div>
+        </div>
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Overview</div>
+            <a href="admin-dashboard.html" class="admin-nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="admin-nav-section">Monitoring</div>
+            <a href="admin-incidents.html" class="admin-nav-link"><i class="fas fa-exclamation-triangle"></i> Incidents</a>
+            <div class="admin-nav-section">Taxonomy</div>
+            <a href="admin-taxonomy.html" class="admin-nav-link active"><i class="fas fa-tags"></i> Manage Taxonomy</a>
+            <div class="admin-nav-section">Site</div>
+            <a href="monitoring.html" class="admin-nav-link" target="_blank"><i class="fas fa-eye"></i> View Public Page</a>
+        </nav>
+        <div class="admin-nav-footer">
+            <button class="admin-logout-btn" onclick="ACAF.logout(); window.location.href='admin.html';">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 class="admin-topbar-title">Manage Taxonomy</h1>
+        </header>
+
+        <div class="admin-content">
+            <div class="admin-breadcrumb">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Taxonomy</span>
+            </div>
+
+            <div id="globalAlert"></div>
+
+            <div class="admin-panel">
+                <!-- Tabs -->
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchTab('countries')" id="tab-countries">
+                        <i class="fas fa-globe-africa"></i> Countries
+                    </button>
+                    <button class="admin-tab" onclick="switchTab('institutions')" id="tab-institutions">
+                        <i class="fas fa-university"></i> Institutions
+                    </button>
+                    <button class="admin-tab" onclick="switchTab('incidentTypes')" id="tab-incidentTypes">
+                        <i class="fas fa-exclamation-triangle"></i> Incident Types
+                    </button>
+                    <button class="admin-tab" onclick="switchTab('discriminationTypes')" id="tab-discriminationTypes">
+                        <i class="fas fa-balance-scale"></i> Discrimination Types
+                    </button>
+                </div>
+
+                <!-- ── COUNTRIES TAB ── -->
+                <div class="admin-tab-content active" id="content-countries">
+                    <div class="inline-add-form" id="countryAddForm">
+                        <div class="form-group">
+                            <label class="form-label">Country Name <span style="color:#DC2626;">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="newCountryName" placeholder="e.g. Ghana">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Region <span style="color:#DC2626;">*</span></label>
+                            <select class="form-control form-control-sm" id="newCountryRegion">
+                                <option value="">— Select Region —</option>
+                                <option>Central Africa</option>
+                                <option>East Africa</option>
+                                <option>North Africa</option>
+                                <option>Southern Africa</option>
+                                <option>West Africa</option>
+                            </select>
+                        </div>
+                        <div style="padding-top:1.5rem;">
+                            <button type="button" class="btn-admin-primary" onclick="addCountry()" id="addCountryBtn">
+                                <i class="fas fa-plus"></i> Add Country
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-header" style="border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);padding:1rem 1.5rem;">
+                        <h2 id="countriesCount">Countries</h2>
+                        <div class="admin-search-wrap" style="max-width:260px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="admin-search" placeholder="Search countries..." oninput="renderCountries(this.value)">
+                        </div>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>Country</th><th>Region</th><th style="text-align:right;">Actions</th></tr></thead>
+                            <tbody id="countriesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ── INSTITUTIONS TAB ── -->
+                <div class="admin-tab-content" id="content-institutions">
+                    <div class="inline-add-form">
+                        <div class="form-group" style="flex:1.5;">
+                            <label class="form-label">Institution Name <span style="color:#DC2626;">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="newInstName" placeholder="e.g. University of Ghana">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Abbreviation</label>
+                            <input type="text" class="form-control form-control-sm" id="newInstAbbr" placeholder="e.g. UG" style="max-width:100px;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country <span style="color:#DC2626;">*</span></label>
+                            <select class="form-control form-control-sm" id="newInstCountry" style="min-width:180px;">
+                                <option value="">— Select Country —</option>
+                            </select>
+                        </div>
+                        <div style="padding-top:1.5rem;">
+                            <button type="button" class="btn-admin-primary" onclick="addInstitution()">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-header" style="border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);padding:1rem 1.5rem;">
+                        <h2 id="institutionsCount">Institutions</h2>
+                        <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+                            <select class="admin-filter-select" id="instCountryFilter" onchange="renderInstitutions(document.getElementById('instSearch').value)">
+                                <option value="">All Countries</option>
+                            </select>
+                            <div class="admin-search-wrap" style="max-width:240px;">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="admin-search" id="instSearch" placeholder="Search institutions..." oninput="renderInstitutions(this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>Institution</th><th>Abbreviation</th><th>Country</th><th style="text-align:right;">Actions</th></tr></thead>
+                            <tbody id="institutionsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ── INCIDENT TYPES TAB ── -->
+                <div class="admin-tab-content" id="content-incidentTypes">
+                    <div class="inline-add-form">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Type Name <span style="color:#DC2626;">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="newIncidentTypeName" placeholder="e.g. New Incident Type">
+                        </div>
+                        <div style="padding-top:1.5rem;">
+                            <button type="button" class="btn-admin-primary" onclick="addIncidentType()">
+                                <i class="fas fa-plus"></i> Add Type
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-header" style="border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);padding:1rem 1.5rem;">
+                        <h2 id="incidentTypesCount">Incident Types</h2>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>Type Name</th><th style="text-align:right;">Actions</th></tr></thead>
+                            <tbody id="incidentTypesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ── DISCRIMINATION TYPES TAB ── -->
+                <div class="admin-tab-content" id="content-discriminationTypes">
+                    <div class="inline-add-form">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Discrimination Type <span style="color:#DC2626;">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="newDiscrimTypeName" placeholder="e.g. New Discrimination Type">
+                        </div>
+                        <div style="padding-top:1.5rem;">
+                            <button type="button" class="btn-admin-primary" onclick="addDiscrimType()">
+                                <i class="fas fa-plus"></i> Add Type
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-header" style="border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);padding:1rem 1.5rem;">
+                        <h2 id="discrimTypesCount">Discrimination Types</h2>
+                    </div>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>Type Name</th><th style="text-align:right;">Actions</th></tr></thead>
+                            <tbody id="discrimTypesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Edit Modals -->
+<div class="confirm-overlay" id="editModal">
+    <div class="confirm-box" style="max-width:520px;">
+        <h3 id="editModalTitle">Edit</h3>
+        <div id="editModalBody"></div>
+        <div class="confirm-actions" style="margin-top:1.25rem;">
+            <button class="btn-admin-secondary" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-admin-primary" onclick="saveEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="confirm-overlay" id="deleteConfirm">
+    <div class="confirm-box">
+        <h3><i class="fas fa-trash" style="color:#DC2626;margin-right:0.5rem;"></i>Delete <span id="deleteTypeName"></span></h3>
+        <p>Are you sure you want to delete "<span id="deleteItemName"></span>"? This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn-admin-secondary" onclick="closeDeleteConfirm()">Cancel</button>
+            <button class="btn-admin-danger" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/acaf-data.js"></script>
+<script>
+    if (!ACAF.requireAuth()) { /* redirect */ }
+
+    let deleteTarget = null; // { type, id, name }
+    let editTarget = null;   // { type, id, data }
+
+    const REGIONS = ['Central Africa', 'East Africa', 'North Africa', 'Southern Africa', 'West Africa'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        populateCountrySelects();
+        renderCountries();
+        renderInstitutions();
+        renderIncidentTypes();
+        renderDiscrimTypes();
+
+        // Handle anchor-based tab switching
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById('content-' + hash)) {
+            switchTab(hash);
+        }
+    });
+
+    // ── TABS ──────────────────────────────────────────────────────────────────────
+    function switchTab(name) {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        document.getElementById('content-' + name).classList.add('active');
+    }
+
+    // ── COUNTRY SELECTS ───────────────────────────────────────────────────────────
+    function populateCountrySelects() {
+        const countries = ACAF.getCountries().sort((a,b) => a.name.localeCompare(b.name));
+
+        // Institution country select (add form)
+        const instCountrySelect = document.getElementById('newInstCountry');
+        instCountrySelect.innerHTML = '<option value="">— Select Country —</option>' +
+            countries.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+
+        // Institution filter
+        const instFilter = document.getElementById('instCountryFilter');
+        instFilter.innerHTML = '<option value="">All Countries</option>' +
+            countries.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+    }
+
+    // ── COUNTRIES ─────────────────────────────────────────────────────────────────
+    function addCountry() {
+        const name = document.getElementById('newCountryName').value.trim();
+        const region = document.getElementById('newCountryRegion').value;
+        if (!name || !region) { showAlert('Country name and region are required.', 'error'); return; }
+        ACAF.addCountry(name, region);
+        document.getElementById('newCountryName').value = '';
+        document.getElementById('newCountryRegion').value = '';
+        renderCountries();
+        populateCountrySelects();
+        showAlert('Country added successfully.', 'success');
+    }
+
+    function renderCountries(query) {
+        const q = (query || '').toLowerCase();
+        let countries = ACAF.getCountries();
+        if (q) countries = countries.filter(c => c.name.toLowerCase().includes(q) || c.region.toLowerCase().includes(q));
+        countries.sort((a,b) => a.region.localeCompare(b.region) || a.name.localeCompare(b.name));
+
+        document.getElementById('countriesCount').textContent = `Countries (${ACAF.getCountries().length})`;
+        const tbody = document.getElementById('countriesBody');
+        if (!countries.length) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:2rem;color:var(--color-text-light);">No countries found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = countries.map(c => `
+            <tr>
+                <td style="font-weight:500;">${escapeHtml(c.name)}</td>
+                <td><span class="badge badge-blue">${escapeHtml(c.region)}</span></td>
+                <td>
+                    <div class="table-actions" style="justify-content:flex-end;">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="openEditCountry('${c.id}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="openDelete('country','${c.id}','${escapeAttr(c.name)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    }
+
+    function openEditCountry(id) {
+        const c = ACAF.getCountries().find(c => c.id === id);
+        if (!c) return;
+        editTarget = { type: 'country', id };
+        document.getElementById('editModalTitle').textContent = 'Edit Country';
+        document.getElementById('editModalBody').innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Country Name <span style="color:#DC2626;">*</span></label>
+                <input type="text" class="form-control" id="editCountryName" value="${escapeHtml(c.name)}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Region <span style="color:#DC2626;">*</span></label>
+                <select class="form-control" id="editCountryRegion">
+                    ${REGIONS.map(r => `<option value="${r}" ${r === c.region ? 'selected' : ''}>${r}</option>`).join('')}
+                </select>
+            </div>`;
+        document.getElementById('editModal').classList.add('open');
+    }
+
+    // ── INSTITUTIONS ──────────────────────────────────────────────────────────────
+    function addInstitution() {
+        const name = document.getElementById('newInstName').value.trim();
+        const abbr = document.getElementById('newInstAbbr').value.trim();
+        const country = document.getElementById('newInstCountry').value;
+        if (!name || !country) { showAlert('Institution name and country are required.', 'error'); return; }
+        ACAF.addInstitution(name, country, abbr);
+        document.getElementById('newInstName').value = '';
+        document.getElementById('newInstAbbr').value = '';
+        document.getElementById('newInstCountry').value = '';
+        renderInstitutions();
+        showAlert('Institution added successfully.', 'success');
+    }
+
+    function renderInstitutions(query) {
+        const q = (query || document.getElementById('instSearch').value || '').toLowerCase();
+        const countryFilter = document.getElementById('instCountryFilter').value;
+        let institutions = ACAF.getInstitutions();
+        if (countryFilter) institutions = institutions.filter(i => i.country === countryFilter);
+        if (q) institutions = institutions.filter(i => i.name.toLowerCase().includes(q) || i.country.toLowerCase().includes(q));
+        institutions.sort((a,b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
+
+        document.getElementById('institutionsCount').textContent = `Institutions (${ACAF.getInstitutions().length})`;
+        const tbody = document.getElementById('institutionsBody');
+        if (!institutions.length) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--color-text-light);">No institutions found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = institutions.map(i => `
+            <tr>
+                <td style="font-weight:500;">${escapeHtml(i.name)}</td>
+                <td>${escapeHtml(i.abbreviation || '—')}</td>
+                <td>${escapeHtml(i.country)}</td>
+                <td>
+                    <div class="table-actions" style="justify-content:flex-end;">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="openEditInstitution('${i.id}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="openDelete('institution','${i.id}','${escapeAttr(i.name)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    }
+
+    function openEditInstitution(id) {
+        const i = ACAF.getInstitutions().find(i => i.id === id);
+        if (!i) return;
+        editTarget = { type: 'institution', id };
+        const countries = ACAF.getCountries().sort((a,b) => a.name.localeCompare(b.name));
+        document.getElementById('editModalTitle').textContent = 'Edit Institution';
+        document.getElementById('editModalBody').innerHTML = `
+            <div class="form-group">
+                <label class="form-label">Institution Name <span style="color:#DC2626;">*</span></label>
+                <input type="text" class="form-control" id="editInstName" value="${escapeHtml(i.name)}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Abbreviation</label>
+                <input type="text" class="form-control" id="editInstAbbr" value="${escapeHtml(i.abbreviation || '')}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Country <span style="color:#DC2626;">*</span></label>
+                <select class="form-control" id="editInstCountry">
+                    ${countries.map(c => `<option value="${escapeHtml(c.name)}" ${c.name === i.country ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
+                </select>
+            </div>`;
+        document.getElementById('editModal').classList.add('open');
+    }
+
+    // ── INCIDENT TYPES ────────────────────────────────────────────────────────────
+    function addIncidentType() {
+        const name = document.getElementById('newIncidentTypeName').value.trim();
+        if (!name) { showAlert('Type name is required.', 'error'); return; }
+        ACAF.addIncidentType(name);
+        document.getElementById('newIncidentTypeName').value = '';
+        renderIncidentTypes();
+        showAlert('Incident type added.', 'success');
+    }
+
+    function renderIncidentTypes() {
+        const types = ACAF.getIncidentTypes();
+        document.getElementById('incidentTypesCount').textContent = `Incident Types (${types.length})`;
+        const tbody = document.getElementById('incidentTypesBody');
+        if (!types.length) {
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:2rem;color:var(--color-text-light);">No types found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = types.map(t => `
+            <tr>
+                <td style="font-weight:500;">${escapeHtml(t.name)}</td>
+                <td>
+                    <div class="table-actions" style="justify-content:flex-end;">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="openEditSimple('incidentType','${t.id}','${escapeAttr(t.name)}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="openDelete('incidentType','${t.id}','${escapeAttr(t.name)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    }
+
+    // ── DISCRIMINATION TYPES ──────────────────────────────────────────────────────
+    function addDiscrimType() {
+        const name = document.getElementById('newDiscrimTypeName').value.trim();
+        if (!name) { showAlert('Type name is required.', 'error'); return; }
+        ACAF.addDiscriminationType(name);
+        document.getElementById('newDiscrimTypeName').value = '';
+        renderDiscrimTypes();
+        showAlert('Discrimination type added.', 'success');
+    }
+
+    function renderDiscrimTypes() {
+        const types = ACAF.getDiscriminationTypes();
+        document.getElementById('discrimTypesCount').textContent = `Discrimination Types (${types.length})`;
+        const tbody = document.getElementById('discrimTypesBody');
+        if (!types.length) {
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:2rem;color:var(--color-text-light);">No types found.</td></tr>`;
+            return;
+        }
+        tbody.innerHTML = types.map(t => `
+            <tr>
+                <td style="font-weight:500;">${escapeHtml(t.name)}</td>
+                <td>
+                    <div class="table-actions" style="justify-content:flex-end;">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="openEditSimple('discrimType','${t.id}','${escapeAttr(t.name)}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="openDelete('discrimType','${t.id}','${escapeAttr(t.name)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    }
+
+    // ── EDIT MODAL ────────────────────────────────────────────────────────────────
+    function openEditSimple(type, id, name) {
+        editTarget = { type, id };
+        const labels = { incidentType: 'Edit Incident Type', discrimType: 'Edit Discrimination Type' };
+        document.getElementById('editModalTitle').textContent = labels[type] || 'Edit';
+        document.getElementById('editModalBody').innerHTML = `
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Name <span style="color:#DC2626;">*</span></label>
+                <input type="text" class="form-control" id="editSimpleName" value="${escapeHtml(name)}">
+            </div>`;
+        document.getElementById('editModal').classList.add('open');
+    }
+
+    function saveEdit() {
+        if (!editTarget) return;
+        const { type, id } = editTarget;
+        let success = false;
+
+        if (type === 'country') {
+            const name = document.getElementById('editCountryName').value.trim();
+            const region = document.getElementById('editCountryRegion').value;
+            if (!name || !region) { showAlert('Name and region are required.', 'error'); return; }
+            ACAF.updateCountry(id, name, region);
+            renderCountries();
+            populateCountrySelects();
+            success = true;
+        } else if (type === 'institution') {
+            const name = document.getElementById('editInstName').value.trim();
+            const abbr = document.getElementById('editInstAbbr').value.trim();
+            const country = document.getElementById('editInstCountry').value;
+            if (!name || !country) { showAlert('Name and country are required.', 'error'); return; }
+            ACAF.updateInstitution(id, name, country, abbr);
+            renderInstitutions();
+            success = true;
+        } else if (type === 'incidentType') {
+            const name = document.getElementById('editSimpleName').value.trim();
+            if (!name) { showAlert('Name is required.', 'error'); return; }
+            ACAF.updateIncidentType(id, name);
+            renderIncidentTypes();
+            success = true;
+        } else if (type === 'discrimType') {
+            const name = document.getElementById('editSimpleName').value.trim();
+            if (!name) { showAlert('Name is required.', 'error'); return; }
+            ACAF.updateDiscriminationType(id, name);
+            renderDiscrimTypes();
+            success = true;
+        }
+
+        if (success) {
+            closeEditModal();
+            showAlert('Updated successfully.', 'success');
+        }
+    }
+
+    function closeEditModal() {
+        editTarget = null;
+        document.getElementById('editModal').classList.remove('open');
+    }
+
+    // ── DELETE ────────────────────────────────────────────────────────────────────
+    function openDelete(type, id, name) {
+        deleteTarget = { type, id, name };
+        const labels = { country: 'Country', institution: 'Institution', incidentType: 'Incident Type', discrimType: 'Discrimination Type' };
+        document.getElementById('deleteTypeName').textContent = labels[type] || '';
+        document.getElementById('deleteItemName').textContent = name;
+        document.getElementById('deleteConfirm').classList.add('open');
+    }
+
+    function closeDeleteConfirm() {
+        deleteTarget = null;
+        document.getElementById('deleteConfirm').classList.remove('open');
+    }
+
+    function confirmDelete() {
+        if (!deleteTarget) return;
+        const { type, id } = deleteTarget;
+        if (type === 'country') { ACAF.deleteCountry(id); renderCountries(); populateCountrySelects(); }
+        else if (type === 'institution') { ACAF.deleteInstitution(id); renderInstitutions(); }
+        else if (type === 'incidentType') { ACAF.deleteIncidentType(id); renderIncidentTypes(); }
+        else if (type === 'discrimType') { ACAF.deleteDiscriminationType(id); renderDiscrimTypes(); }
+        closeDeleteConfirm();
+        showAlert('Deleted successfully.', 'success');
+    }
+
+    // ── UTILS ─────────────────────────────────────────────────────────────────────
+    function showAlert(msg, type) {
+        const el = document.getElementById('globalAlert');
+        el.innerHTML = `<div class="admin-alert admin-alert-${type}"><i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>${escapeHtml(msg)}</div>`;
+        setTimeout(() => { el.innerHTML = ''; }, 4000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    }
+
+    // Close modals on overlay click
+    document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
+    document.getElementById('deleteConfirm').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteConfirm(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeEditModal(); closeDeleteConfirm(); } });
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Form - ACAF Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="admin-page">
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-sidebar-brand">
+            <img src="assets/images/ACAF_logo.png" alt="ACAF">
+            <div><span>ACAF</span><small>Admin Panel</small></div>
+        </div>
+        <nav class="admin-nav">
+            <div class="admin-nav-section">Overview</div>
+            <a href="admin-dashboard.html" class="admin-nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="admin-nav-section">Monitoring</div>
+            <a href="admin-incidents.html" class="admin-nav-link active"><i class="fas fa-exclamation-triangle"></i> Incidents</a>
+            <div class="admin-nav-section">Taxonomy</div>
+            <a href="admin-taxonomy.html" class="admin-nav-link"><i class="fas fa-tags"></i> Manage Taxonomy</a>
+            <div class="admin-nav-section">Site</div>
+            <a href="monitoring.html" class="admin-nav-link" target="_blank"><i class="fas fa-eye"></i> View Public Page</a>
+        </nav>
+        <div class="admin-nav-footer">
+            <button class="admin-logout-btn" onclick="ACAF.logout(); window.location.href='admin.html';">
+                <i class="fas fa-sign-out-alt"></i> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1 class="admin-topbar-title" id="pageTitle">Add Incident</h1>
+            <div class="admin-topbar-right">
+                <a href="admin-incidents.html" class="btn-admin-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Incidents
+                </a>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <div class="admin-breadcrumb">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="admin-incidents.html">Incidents</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbLabel">New Incident</span>
+            </div>
+
+            <div id="formAlert"></div>
+
+            <form id="incidentForm" onsubmit="handleSubmit(event)" novalidate>
+                <div class="admin-form-grid">
+
+                    <!-- LEFT: Main fields -->
+                    <div>
+                        <!-- Core Info -->
+                        <div class="admin-panel" style="margin-bottom:1.5rem;">
+                            <div class="admin-panel-header"><h2>Core Information</h2></div>
+                            <div class="admin-panel-body">
+                                <div class="form-group">
+                                    <label class="form-label" for="title">Title <span style="color:#DC2626;">*</span></label>
+                                    <input type="text" class="form-control" id="title" required placeholder="Brief, descriptive title of the incident">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="description">Description / Summary <span style="color:#DC2626;">*</span></label>
+                                    <textarea class="form-control" id="description" rows="6" required placeholder="Provide a detailed account of the incident, including context, persons affected, and outcome where known."></textarea>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label" for="incidentDate">Incident Date <span style="color:#DC2626;">*</span></label>
+                                        <input type="date" class="form-control" id="incidentDate" required>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label" for="city">City / Specific Location</label>
+                                        <input type="text" class="form-control" id="city" placeholder="e.g. Accra, Lagos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="admin-panel" style="margin-bottom:1.5rem;">
+                            <div class="admin-panel-header"><h2>Location &amp; Institution</h2></div>
+                            <div class="admin-panel-body">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label" for="country">Country <span style="color:#DC2626;">*</span></label>
+                                        <select class="form-control" id="country" required onchange="updateInstitutionDropdown()">
+                                            <option value="">— Select Country —</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="form-label" for="institution">Institution <span style="color:#DC2626;">*</span></label>
+                                        <select class="form-control" id="institution" required>
+                                            <option value="">— Select Country First —</option>
+                                        </select>
+                                        <p class="form-hint" id="institutionHint" style="display:none;">Select a country to filter institutions. <a href="admin-taxonomy.html#institutions" style="color:var(--color-primary);">Add new institution</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Source & Documents -->
+                        <div class="admin-panel">
+                            <div class="admin-panel-header"><h2>Source &amp; Evidence</h2></div>
+                            <div class="admin-panel-body">
+                                <div class="form-group">
+                                    <label class="form-label" for="source">Source / Link to News</label>
+                                    <input type="url" class="form-control" id="source" placeholder="https://example.com/news-article">
+                                    <p class="form-hint">Link to a credible news article, report, or statement about the incident.</p>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="form-label">Supporting Documents</label>
+                                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Click to upload files</p>
+                                        <small>PDF, DOC, DOCX, JPG, PNG &mdash; Max 5MB each</small>
+                                    </div>
+                                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none;" onchange="handleFileSelect(this)">
+                                    <div class="file-list" id="fileList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Classifications -->
+                    <div>
+                        <div class="admin-panel" style="margin-bottom:1.5rem;">
+                            <div class="admin-panel-header"><h2>Classification</h2></div>
+                            <div class="admin-panel-body">
+                                <div class="form-group">
+                                    <label class="form-label">Type of Incident <span style="color:#DC2626;">*</span></label>
+                                    <div class="filter-search-wrap" style="margin-bottom:0.5rem;">
+                                        <i class="fas fa-search" style="position:absolute;left:0.625rem;top:50%;transform:translateY(-50%);color:var(--color-text-light);font-size:0.75rem;pointer-events:none;"></i>
+                                        <input type="text" style="width:100%;padding:0.45rem 0.75rem 0.45rem 2rem;border:1px solid var(--color-border);border-radius:4px;font-size:0.8rem;" placeholder="Search types..." oninput="searchMultiselect('incidentTypeOptions', this.value)">
+                                    </div>
+                                    <div class="multiselect-wrap">
+                                        <div class="multiselect-options" id="incidentTypeOptions"></div>
+                                    </div>
+                                    <p class="form-hint">Select all that apply.</p>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="form-label">Type of Discrimination</label>
+                                    <div class="multiselect-wrap">
+                                        <div class="multiselect-options" id="discrimTypeOptions"></div>
+                                    </div>
+                                    <p class="form-hint">Select all that apply.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save actions -->
+                        <div class="admin-panel">
+                            <div class="admin-panel-body">
+                                <p class="admin-form-section-title" style="margin-top:0;">Save Incident</p>
+                                <button type="submit" class="btn-admin-primary" style="width:100%;justify-content:center;margin-bottom:0.75rem;" id="saveBtn">
+                                    <i class="fas fa-save"></i> Save Incident
+                                </button>
+                                <a href="admin-incidents.html" class="btn-admin-secondary" style="width:100%;justify-content:center;display:flex;">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script src="assets/js/acaf-data.js"></script>
+<script>
+    if (!ACAF.requireAuth()) { /* redirect */ }
+
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('id');
+    let editIncident = null;
+    let selectedFiles = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set mode
+        if (editId) {
+            editIncident = ACAF.getIncidentById(editId);
+            if (!editIncident) {
+                window.location.href = 'admin-incidents.html';
+                return;
+            }
+            document.getElementById('pageTitle').textContent = 'Edit Incident';
+            document.getElementById('breadcrumbLabel').textContent = 'Edit Incident';
+        }
+
+        populateCountries();
+        populateIncidentTypes();
+        populateDiscrimTypes();
+
+        if (editIncident) populateForm(editIncident);
+    });
+
+    function populateCountries() {
+        const countries = ACAF.getCountries();
+        const select = document.getElementById('country');
+        // Group by region
+        const regions = {};
+        countries.forEach(c => {
+            if (!regions[c.region]) regions[c.region] = [];
+            regions[c.region].push(c);
+        });
+        Object.entries(regions).forEach(([region, list]) => {
+            const group = document.createElement('optgroup');
+            group.label = region;
+            list.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.name;
+                opt.textContent = c.name;
+                group.appendChild(opt);
+            });
+            select.appendChild(group);
+        });
+    }
+
+    function updateInstitutionDropdown() {
+        const country = document.getElementById('country').value;
+        const instSelect = document.getElementById('institution');
+        const hint = document.getElementById('institutionHint');
+        instSelect.innerHTML = '<option value="">— Select Institution —</option>';
+
+        if (!country) {
+            instSelect.innerHTML = '<option value="">— Select Country First —</option>';
+            hint.style.display = 'none';
+            return;
+        }
+
+        const institutions = ACAF.getInstitutionsByCountries([country]);
+        hint.style.display = '';
+
+        if (!institutions.length) {
+            instSelect.innerHTML = '<option value="">No institutions for this country</option>';
+        } else {
+            institutions.forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.name;
+                opt.textContent = i.name + (i.abbreviation ? ` (${i.abbreviation})` : '');
+                instSelect.appendChild(opt);
+            });
+        }
+
+        // Also allow typing a custom institution name
+        const customOpt = document.createElement('option');
+        customOpt.value = '__custom__';
+        customOpt.textContent = '+ Enter custom institution name';
+        instSelect.appendChild(customOpt);
+    }
+
+    document.getElementById('institution').addEventListener('change', function() {
+        if (this.value === '__custom__') {
+            const custom = prompt('Enter institution name:');
+            if (custom && custom.trim()) {
+                const opt = document.createElement('option');
+                opt.value = custom.trim();
+                opt.textContent = custom.trim();
+                this.insertBefore(opt, this.querySelector('[value="__custom__"]'));
+                this.value = custom.trim();
+            } else {
+                this.value = '';
+            }
+        }
+    });
+
+    function populateIncidentTypes() {
+        const types = ACAF.getIncidentTypes();
+        const container = document.getElementById('incidentTypeOptions');
+        container.innerHTML = types.map(t => `
+            <label class="multiselect-option">
+                <input type="checkbox" name="incidentType" value="${escapeHtml(t.name)}">
+                ${escapeHtml(t.name)}
+            </label>`).join('');
+    }
+
+    function populateDiscrimTypes() {
+        const types = ACAF.getDiscriminationTypes();
+        const container = document.getElementById('discrimTypeOptions');
+        container.innerHTML = types.map(t => `
+            <label class="multiselect-option">
+                <input type="checkbox" name="discrimType" value="${escapeHtml(t.name)}">
+                ${escapeHtml(t.name)}
+            </label>`).join('');
+    }
+
+    function searchMultiselect(containerId, query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll('#' + containerId + ' .multiselect-option').forEach(opt => {
+            opt.style.display = !q || opt.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    function populateForm(inc) {
+        document.getElementById('title').value = inc.title || '';
+        document.getElementById('description').value = inc.description || '';
+        document.getElementById('incidentDate').value = inc.date || '';
+        document.getElementById('city').value = inc.city || '';
+        document.getElementById('source').value = inc.source || '';
+        document.getElementById('country').value = inc.country || '';
+
+        if (inc.country) {
+            updateInstitutionDropdown();
+            setTimeout(() => {
+                document.getElementById('institution').value = inc.institution || '';
+            }, 50);
+        }
+
+        // Check incident types
+        (inc.incidentTypes || []).forEach(t => {
+            const cb = document.querySelector(`#incidentTypeOptions input[value="${CSS.escape(t)}"]`);
+            if (cb) cb.checked = true;
+        });
+
+        // Check discrimination types
+        (inc.discriminationTypes || []).forEach(t => {
+            const cb = document.querySelector(`#discrimTypeOptions input[value="${CSS.escape(t)}"]`);
+            if (cb) cb.checked = true;
+        });
+
+        // Existing docs
+        selectedFiles = (inc.documents || []).slice();
+        renderFileList();
+    }
+
+    // ── File handling ─────────────────────────────────────────────────────────────
+    function handleFileSelect(input) {
+        const files = Array.from(input.files);
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        files.forEach(f => {
+            if (f.size > maxSize) {
+                showFormAlert(`File "${f.name}" exceeds the 5MB limit and was not added.`, 'error');
+                return;
+            }
+            if (!selectedFiles.includes(f.name)) {
+                selectedFiles.push(f.name);
+            }
+        });
+        input.value = '';
+        renderFileList();
+    }
+
+    function renderFileList() {
+        const container = document.getElementById('fileList');
+        if (!selectedFiles.length) { container.innerHTML = ''; return; }
+        container.innerHTML = selectedFiles.map((name, i) => `
+            <div class="file-item">
+                <i class="fas fa-file-alt"></i>
+                <span style="flex:1;font-size:0.8rem;">${escapeHtml(name)}</span>
+                <button type="button" class="file-remove" onclick="removeFile(${i})" title="Remove"><i class="fas fa-times"></i></button>
+            </div>`).join('');
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderFileList();
+    }
+
+    // ── Form submit ───────────────────────────────────────────────────────────────
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const date = document.getElementById('incidentDate').value;
+        const country = document.getElementById('country').value;
+        const institution = document.getElementById('institution').value;
+
+        // Validation
+        let valid = true;
+        if (!title) { highlightInvalid('title'); valid = false; }
+        if (!description) { highlightInvalid('description'); valid = false; }
+        if (!date) { highlightInvalid('incidentDate'); valid = false; }
+        if (!country) { highlightInvalid('country'); valid = false; }
+        if (!institution || institution === '__custom__') { highlightInvalid('institution'); valid = false; }
+
+        const incidentTypes = [...document.querySelectorAll('#incidentTypeOptions input:checked')].map(cb => cb.value);
+        if (!incidentTypes.length) {
+            showFormAlert('Please select at least one Type of Incident.', 'error');
+            valid = false;
+        }
+
+        if (!valid) {
+            showFormAlert('Please fill in all required fields.', 'error');
+            return;
+        }
+
+        const discriminationTypes = [...document.querySelectorAll('#discrimTypeOptions input:checked')].map(cb => cb.value);
+        const source = document.getElementById('source').value.trim();
+        const city = document.getElementById('city').value.trim();
+
+        const data = {
+            title, description, date, country, institution, city,
+            incidentTypes, discriminationTypes, source,
+            documents: selectedFiles.slice()
+        };
+
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        setTimeout(() => {
+            if (editId) {
+                ACAF.updateIncident(editId, data);
+            } else {
+                ACAF.addIncident(data);
+            }
+            window.location.href = 'admin-incidents.html?saved=1';
+        }, 300);
+    }
+
+    function highlightInvalid(id) {
+        const el = document.getElementById(id);
+        el.classList.add('is-invalid');
+        el.addEventListener('input', () => el.classList.remove('is-invalid'), { once: true });
+        el.addEventListener('change', () => el.classList.remove('is-invalid'), { once: true });
+    }
+
+    function showFormAlert(msg, type) {
+        const el = document.getElementById('formAlert');
+        el.innerHTML = `<div class="admin-alert admin-alert-${type}"><i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>${escapeHtml(msg)}</div>`;
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => { el.innerHTML = ''; }, 5000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+</script>
+</body>
+</html>
